@@ -14,10 +14,6 @@ app.get('/', function(request, response) {
   response.render('pages/index')
 });
 
-app.get('/cool', function(request, response) {
-  response.send(cool());
-});
-
 app.get('/times', function(request, response) {
     var result = ''
     var times = process.env.TIMES || 5
