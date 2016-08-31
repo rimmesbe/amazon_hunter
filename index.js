@@ -1,6 +1,6 @@
-var cool = require('cool-ascii-faces');
 var express = require('express');
 var app = express();
+var aws = require("./node_modules/aws-lib/lib/aws");
 
 app.set('port', (process.env.PORT || 5000));
 
@@ -11,15 +11,38 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
 app.get('/', function(request, response) {
-  response.render('pages/index')
+  response.render('pages/index', { err : " "});
 });
 
-app.get('/times', function(request, response) {
-    var result = ''
-    var times = process.env.TIMES || 5
-    for (i=0; i < times; i++)
-      result += i + ' ';
-  response.send(result);
+app.get('/test', function(request, response) {
+  var search = request.query.item;
+  var testing;
+  prodAdv = aws.createProdAdvClient(process.env.AccessKeyId, process.env.SecretAccessKey, process.env.AssociateTag);
+
+  function doCall(callback) {
+    prodAdv.call("ItemLookup", {ItemId: search, ResponseGroup: 'ItemAttributes, Images'}, function(err, result) {
+      var data = result;
+      callback(data);
+      return;
+    })
+  };
+
+  doCall(function(data){
+    testing = data;
+    var detailsPageUrl, mediumImageUrl, title;
+    if(testing['Items']['Item']){
+      detailsPageUrl = testing['Items']['Item']['DetailPageURL'];
+      mediumImageUrl = testing['Items']['Item']['MediumImage']['URL'];
+      title = testing['Items']['Item']['ItemAttributes']['Title'];
+      // var price = testing['Items']['Item']['ItemAttributes']['ListPrice']['FormattedPrice'];
+    }
+
+    if(testing['Items']['Item']){
+      response.render('pages/search', { image : mediumImageUrl, title : title, details : detailsPageUrl });
+    } else {
+      response.render('pages/index', { err : "search failed" });
+    }
+  });
 });
 
 app.listen(app.get('port'), function() {

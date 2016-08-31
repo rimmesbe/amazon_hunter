@@ -25,3 +25,23 @@
     .jumbotron .lang-logo img {
       max-width: 100%; }
 
+.form-div {
+  text-align: center;
+  margin: 50px;
+}
+
+.search-title {
+  text-align: center;
+}
+
+.product-title {
+  max-width: 33%;
+  margin: 0 auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.content-div {
+  text-align: center;
+  margin: 50px;
+}
